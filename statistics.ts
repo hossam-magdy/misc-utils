@@ -54,16 +54,16 @@ export const statistics = (newElement?: number, oldStats?: Stats): Stats => {
     add: (elem) => statistics(elem, stats),
     show: (pretty) =>
       console.log(
-        pretty ? JSON.stringify(stats, null, 4) : JSON.stringify(stats)
+        pretty ? JSON.stringify(stats, null, 4) : JSON.stringify(stats),
       ),
   };
-  if (typeof newElement !== 'number') return stats;
+  if (typeof newElement !== "number") return stats;
   //#endregion
 
   // extracting old/current stat values
   const { avg, count, max, min, total, variance } = stats;
 
-  //#region calculate new stat values
+  //#region calculate new numbers
   stats.count++;
   stats.total = total + newElement;
   stats.min = count === 0 ? newElement : Math.min(min, newElement);
@@ -78,25 +78,3 @@ export const statistics = (newElement?: number, oldStats?: Stats): Stats => {
   return stats;
 };
 // statistics(1).add(2).show();
-
-export const testStatistics = () => {
-  const actual: any = statistics(1).add(2);
-  const expected: any = {
-    avg: 1.5,
-    count: 2,
-    max: 2,
-    min: 1,
-    sd: 0.5,
-    total: 3,
-    variance: 0.25,
-  };
-  for (const k in expected) {
-    if (actual[k] === expected[k])
-      console.log(`"${k}" is correctly calculated`);
-    else
-      console.error(
-        `"${k}" is NOT correctly calculated; Expected "${expected[k]}", found "${actual[k]}"`
-      );
-  }
-};
-// testStatistics();

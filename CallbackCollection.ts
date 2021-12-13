@@ -29,7 +29,7 @@ export class CallbackCollection<I = undefined, O = unknown> {
 
   add(
     callback: Callback<I, O>,
-    { onlyOnce = false }: { onlyOnce?: boolean } = {}
+    { onlyOnce = false }: { onlyOnce?: boolean } = {},
   ) {
     this.collection.add({ callback, onlyOnce });
   }
@@ -59,8 +59,8 @@ export class CallbackCollection<I = undefined, O = unknown> {
       const returnedPossiblePromise = item.callback.call(self, arg);
       // Remove the transiet callback, if it's result is NOT boolean false
       Promise.resolve(returnedPossiblePromise).then((returnedValue) => {
-        const isFulfilled =
-          typeof returnedValue !== 'boolean' || returnedValue !== false;
+        const isFulfilled = typeof returnedValue !== "boolean" ||
+          returnedValue !== false;
         if (item.onlyOnce && isFulfilled) {
           this.collection.delete(item);
         }
