@@ -1,8 +1,6 @@
 import { statistics } from "./statistics.ts";
 import { assertObjectMatch } from "https://deno.land/std@0.117.0/testing/asserts.ts";
 
-// deno test --allow-net {PATH_OR_URL_TO_THIS_FILE}
-
 Deno.test("Calculates stats (avg, sd, var, … etc), for [1,2]", () => {
   const actual = statistics(1).add(2);
   const expected = {
