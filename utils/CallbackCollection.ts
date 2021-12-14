@@ -1,9 +1,11 @@
-type Callback<I = unknown, O = unknown> = (arg: I) => O;
+type AnyFunction = (...args: any[]) => any;
 
-type CallbackItem<I = unknown, O = unknown> = {
-  callback: Callback<I, O>;
+type CallbackItem<Fn extends AnyFunction> = {
+  callback: Fn;
   onlyOnce: boolean;
 };
+
+type CallbackOptions = { onlyOnce?: boolean };
 
 /**
  * Stores collection of callbacks to be all invoked when needed.
@@ -24,25 +26,23 @@ type CallbackItem<I = unknown, O = unknown> = {
  * //  `someCallback2` will NOT be called again, because it is configured "onlyOnce"
  * ```
  */
-export class CallbackCollection<I = undefined, O = unknown> {
-  private collection = new Set<CallbackItem<I, O>>();
+export class CallbackCollection<Fn extends AnyFunction> {
+  private collection = new Set<CallbackItem<Fn>>();
 
-  add(
-    callback: Callback<I, O>,
-    { onlyOnce = false }: { onlyOnce?: boolean } = {},
-  ) {
+  constructor(initialCb?: Fn, options?: CallbackOptions) {
+    if (initialCb) {
+      this.add(initialCb, options);
+    }
+  }
+
+  add = (callback: Fn, { onlyOnce = false }: CallbackOptions = {}) =>
     this.collection.add({ callback, onlyOnce });
-  }
 
-  addOnlyOnce(callback: Callback<I, O>) {
-    this.add(callback, { onlyOnce: true });
-  }
+  addOnlyOnce = (callback: Fn) => this.add(callback, { onlyOnce: true });
 
-  clear() {
-    this.collection.clear();
-  }
+  clear = () => this.collection.clear();
 
-  delete(callback: Callback<I, O>) {
+  delete = (callback: Fn) => {
     let callbackItem;
     this.collection.forEach((i) => {
       if (i.callback === callback) {
@@ -52,21 +52,24 @@ export class CallbackCollection<I = undefined, O = unknown> {
     if (callbackItem) {
       this.collection.delete(callbackItem);
     }
-  }
+  };
 
-  invoke<T>(arg: I, self?: T) {
+  invoke = (...args: Parameters<Fn>): ReturnType<Fn>[] => {
+    const returnVals = [] as ReturnType<Fn>[];
     this.collection.forEach((item) => {
-      const returnedPossiblePromise = item.callback.call(self, arg);
+      const returnedPossiblePromise = item.callback(...args);
       // Remove the transiet callback, if it's result is NOT boolean false
-      Promise.resolve(returnedPossiblePromise).then((returnedValue) => {
-        const isFulfilled = typeof returnedValue !== "boolean" ||
-          returnedValue !== false;
+      Promise.resolve(returnedPossiblePromise).then((returnVal) => {
+        returnVals.push(returnVal);
+        const isFulfilled =
+          typeof returnVal !== 'boolean' || returnVal !== false;
         if (item.onlyOnce && isFulfilled) {
           this.collection.delete(item);
         }
       });
     });
-  }
+    return returnVals;
+  };
 
   get size() {
     return this.collection.size;
