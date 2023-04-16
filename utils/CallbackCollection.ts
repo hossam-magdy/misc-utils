@@ -61,8 +61,8 @@ export class CallbackCollection<Fn extends AnyFunction> {
       // Remove the transiet callback, if it's result is NOT boolean false
       Promise.resolve(returnedPossiblePromise).then((returnVal) => {
         returnVals.push(returnVal);
-        const isFulfilled =
-          typeof returnVal !== 'boolean' || returnVal !== false;
+        const isFulfilled = typeof returnVal !== "boolean" ||
+          returnVal !== false;
         if (item.onlyOnce && isFulfilled) {
           this.collection.delete(item);
         }

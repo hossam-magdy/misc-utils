@@ -1,7 +1,7 @@
 export const throttle = <IArg>(
   wait: number = 100,
   fn: (...arg: IArg[]) => any,
-): ((...args: IArg[]) => void) => {
+): (...args: IArg[]) => void => {
   let inThrottle: boolean;
   let lastTimeout: ReturnType<typeof setTimeout>;
   let lastTime: number;

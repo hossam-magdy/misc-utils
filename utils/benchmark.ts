@@ -1,9 +1,12 @@
-import { statistics } from './statistics.ts';
+import { statistics } from "./statistics.ts";
 
 /**
  * Example: benchmark(someFunction, 100_000).show();
  */
-export const benchmark = (cb: (...args: unknown[]) => unknown, times = 1000) => {
+export const benchmark = (
+  cb: (...args: unknown[]) => unknown,
+  times = 1000,
+) => {
   const stats = statistics();
   for (let i = 0; i < times; i++) {
     const start = window.performance.now();
